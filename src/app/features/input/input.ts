@@ -116,13 +116,47 @@ import { StudyPlan } from '../../core/models/study-plan.model';
 
           <!-- Right Pane: Saved Plans -->
           <div class="bg-white rounded-2xl shadow-xl p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-              <span
-                class="w-8 h-8 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center text-white text-sm mr-3"
-                >📚</span
-              >
-              Saved Plans
-            </h2>
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+                <span
+                  class="w-8 h-8 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center text-white text-sm mr-3"
+                  >📚</span
+                >
+                Saved Plans
+              </h2>
+              <div class="flex gap-2">
+                <button
+                  (click)="exportData()"
+                  class="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 hover:text-indigo-600 transition-colors duration-200 flex items-center shadow-sm"
+                  title="Export Data"
+                >
+                  <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                    ></path>
+                  </svg>
+                  Export
+                </button>
+                <button
+                  (click)="triggerImport()"
+                  class="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 hover:text-indigo-600 transition-colors duration-200 flex items-center shadow-sm"
+                  title="Import Data"
+                >
+                  <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                    ></path>
+                  </svg>
+                  Import
+                </button>
+              </div>
+            </div>
 
             @if (savedPlans().length > 0) {
             <div class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
@@ -253,6 +287,59 @@ export class InputComponent implements OnInit {
 
   openPlan(id: number) {
     this.router.navigate(['/plan', id]);
+  }
+
+  exportData() {
+    this.studyPlanService.exportAllData().subscribe((data) => {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `study-genius-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    });
+  }
+
+  triggerImport() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e: any) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (re) => {
+          try {
+            const data = JSON.parse(re.target?.result as string);
+            this.importData(data);
+          } catch (err) {
+            console.error('Invalid JSON', err);
+            alert('Invalid JSON file');
+          }
+        };
+        reader.readAsText(file);
+      }
+    };
+    input.click();
+  }
+
+  importData(data: any) {
+    if (!confirm('Importing will add these plans to your library. Continue?')) return;
+
+    this.isLoading.set(true);
+    this.studyPlanService.importAllData(data).subscribe({
+      next: () => {
+        this.loadSavedPlans();
+        this.isLoading.set(false);
+        alert('Data imported successfully!');
+      },
+      error: (err) => {
+        console.error('Import failed', err);
+        this.isLoading.set(false);
+        alert('Import failed: ' + err.message);
+      },
+    });
   }
 
   deletePlan(id: number) {

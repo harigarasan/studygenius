@@ -6,6 +6,7 @@ import {
   StudyPlan,
   InterviewCategory,
   InterviewQuestion,
+  StudySection,
 } from '../../core/models/study-plan.model';
 import { AiService } from '../../core/services/ai.service';
 import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -121,6 +122,33 @@ import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
                 *ngIf="showResume()"
                 class="px-4 py-4 bg-white border-t border-gray-200 space-y-4"
               >
+                <div class="flex justify-end mb-2">
+                  @if (!isEditingInfo()) {
+                  <button
+                    (click)="toggleInfoEdit()"
+                    class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200"
+                  >
+                    Edit Info
+                  </button>
+                  } @else {
+                  <div class="flex gap-2">
+                    <button
+                      (click)="saveInputs()"
+                      class="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors duration-200"
+                    >
+                      Save
+                    </button>
+                    <button
+                      (click)="cancelInfoEdit()"
+                      class="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300 transition-colors duration-200"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  }
+                </div>
+
+                @if (isEditingInfo()) {
                 <div>
                   <label class="block text-sm font-semibold text-gray-700 mb-2"
                     >Resume / Skills</label
@@ -143,63 +171,201 @@ import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
                     placeholder="Edit the job description..."
                   ></textarea>
                 </div>
-                <button
-                  (click)="saveInputs()"
-                  class="px-6 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors duration-200"
-                >
-                  Save Changes
-                </button>
+                } @else {
+                <div>
+                  <h4 class="text-sm font-semibold text-gray-700 mb-2">Resume / Skills</h4>
+                  <div class="bg-gray-50 p-4 rounded-lg text-gray-700 text-sm whitespace-pre-wrap">
+                    {{ plan()?.resume }}
+                  </div>
+                </div>
+                <div>
+                  <h4 class="text-sm font-semibold text-gray-700 mb-2">Job Description</h4>
+                  <div class="bg-gray-50 p-4 rounded-lg text-gray-700 text-sm whitespace-pre-wrap">
+                    {{ plan()?.jobDescription }}
+                  </div>
+                </div>
+                }
               </div>
             </div>
           </div>
 
           <!-- Sections List -->
           <div class="space-y-3">
-            @for (section of plan()?.sections; track section.title) {
-            <div
-              class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300"
-            >
+            <div class="flex justify-end mb-4">
               <button
-                (click)="toggleSection(section.title)"
-                class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors duration-200"
+                (click)="addSection()"
+                class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center shadow-sm"
               >
-                <h3 class="text-lg font-bold text-gray-900 text-left">{{ section.title }}</h3>
-                <svg
-                  class="w-5 h-5 text-gray-500 transform transition-transform duration-200"
-                  [class.rotate-180]="expandedSections().has(section.title)"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    d="M19 9l-7 7-7-7"
+                    d="M12 4v16m8-8H4"
                   ></path>
                 </svg>
+                Add Section
               </button>
+            </div>
 
-              <div
-                *ngIf="expandedSections().has(section.title)"
-                class="px-6 py-4 bg-gradient-to-br from-gray-50 to-white border-t border-gray-200"
-              >
-                <p class="text-gray-700 mb-4">{{ section.goals }}</p>
-                <button
-                  (click)="openMaterials(section.id!)"
-                  class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center"
-                >
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                    ></path>
-                  </svg>
-                  View Materials
-                </button>
+            @for (section of plan()?.sections; track section.id; let i = $index) {
+            <div
+              class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300"
+            >
+              @if (editingSectionIndex() === i) {
+              <!-- Edit Mode -->
+              <div class="px-6 py-4 bg-gray-50 border-l-4 border-indigo-500">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-lg font-bold text-indigo-600">Editing Section</h3>
+                  <div class="flex gap-2">
+                    <button
+                      (click)="saveSection(i)"
+                      class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium"
+                    >
+                      Save
+                    </button>
+                    <button
+                      (click)="cancelEditSection()"
+                      class="px-3 py-1.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm font-medium"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Title</label>
+                    <input
+                      [(ngModel)]="tempSection.title"
+                      class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none"
+                      placeholder="Section Title"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Goals</label>
+                    <textarea
+                      [(ngModel)]="tempSection.goals"
+                      rows="3"
+                      class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none resize-none"
+                      placeholder="Section Goals"
+                    ></textarea>
+                  </div>
+                </div>
               </div>
+              } @else {
+              <!-- View Mode -->
+              <div class="flex flex-col">
+                <div class="flex items-center justify-between px-6 py-4 bg-white">
+                  <button
+                    (click)="toggleSection(section.title)"
+                    class="flex-1 flex items-center text-left hover:text-indigo-600 transition-colors duration-200"
+                  >
+                    <h3 class="text-lg font-bold text-gray-900 mr-3">{{ section.title }}</h3>
+                    <svg
+                      class="w-5 h-5 text-gray-400 transform transition-transform duration-200"
+                      [class.rotate-180]="expandedSections().has(section.title)"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                      ></path>
+                    </svg>
+                  </button>
+
+                  <div class="flex items-center gap-2 ml-4">
+                    <!-- Reorder Buttons -->
+                    <div class="flex flex-col mr-2">
+                      <button
+                        (click)="$event.stopPropagation(); moveSection(i, 'up')"
+                        [disabled]="i === 0"
+                        class="text-gray-400 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Move Up"
+                      >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M5 15l7-7 7 7"
+                          ></path>
+                        </svg>
+                      </button>
+                      <button
+                        (click)="$event.stopPropagation(); moveSection(i, 'down')"
+                        [disabled]="i === (plan()?.sections?.length || 0) - 1"
+                        class="text-gray-400 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Move Down"
+                      >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 9l-7 7-7-7"
+                          ></path>
+                        </svg>
+                      </button>
+                    </div>
+
+                    <!-- Actions -->
+                    <button
+                      (click)="$event.stopPropagation(); editSection(i, section)"
+                      class="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors duration-200"
+                      title="Edit Section"
+                    >
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        ></path>
+                      </svg>
+                    </button>
+                    <button
+                      (click)="$event.stopPropagation(); deleteSection(i)"
+                      class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                      title="Delete Section"
+                    >
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        ></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  *ngIf="expandedSections().has(section.title)"
+                  class="px-6 py-4 bg-gradient-to-br from-gray-50 to-white border-t border-gray-200"
+                >
+                  <p class="text-gray-700 mb-4">{{ section.goals }}</p>
+                  <button
+                    (click)="openMaterials(section.id!)"
+                    class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center"
+                  >
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                      ></path>
+                    </svg>
+                    View Materials
+                  </button>
+                </div>
+              </div>
+              }
             </div>
             }
           </div>
@@ -452,6 +618,7 @@ export class StudyPlanComponent implements OnInit {
 
   // Resume/JD Edit State
   showResume = signal(false);
+  isEditingInfo = signal(false);
   isRegenerating = signal(false);
   resumeControl = new FormControl('');
   jdControl = new FormControl('');
@@ -509,6 +676,20 @@ export class StudyPlanComponent implements OnInit {
     this.showResume.update((v) => !v);
   }
 
+  toggleInfoEdit() {
+    this.isEditingInfo.set(true);
+    // Reset controls to current plan values
+    const plan = this.plan();
+    if (plan) {
+      this.resumeControl.setValue(plan.resume);
+      this.jdControl.setValue(plan.jobDescription);
+    }
+  }
+
+  cancelInfoEdit() {
+    this.isEditingInfo.set(false);
+  }
+
   saveInputs() {
     const currentPlan = this.plan();
     if (!currentPlan) return;
@@ -521,7 +702,7 @@ export class StudyPlanComponent implements OnInit {
 
     this.studyPlanService.updateStudyPlan(updatedPlan).subscribe((saved) => {
       this.plan.set(saved);
-      this.showResume.set(false);
+      this.isEditingInfo.set(false);
     });
   }
 
@@ -654,6 +835,97 @@ export class StudyPlanComponent implements OnInit {
     allQuestions.splice(realIndex, 1);
 
     const updatedPlan = { ...currentPlan, interviewQuestions: allQuestions };
+    this.studyPlanService.updateStudyPlan(updatedPlan).subscribe((saved) => {
+      this.plan.set(saved);
+    });
+  }
+
+  // Roadmap CRUD/Reorder State
+  editingSectionIndex = signal<number | null>(null);
+  tempSection: Partial<StudySection> = {};
+
+  addSection() {
+    const currentPlan = this.plan();
+    if (!currentPlan) return;
+
+    const newSection: StudySection = {
+      id: crypto.randomUUID(),
+      title: 'New Section',
+      goals: 'Describe the goals for this section...',
+      requiredSkills: [],
+      tasks: [],
+      estimatedHours: 1,
+      resources: [],
+    };
+
+    const updatedPlan = {
+      ...currentPlan,
+      sections: [...currentPlan.sections, newSection],
+    };
+
+    this.studyPlanService.updateStudyPlan(updatedPlan).subscribe((saved) => {
+      this.plan.set(saved);
+      this.editSection(saved.sections.length - 1, newSection);
+    });
+  }
+
+  editSection(index: number, section: StudySection) {
+    this.editingSectionIndex.set(index);
+    this.tempSection = JSON.parse(JSON.stringify(section)); // Deep copy
+  }
+
+  cancelEditSection() {
+    this.editingSectionIndex.set(null);
+    this.tempSection = {};
+  }
+
+  saveSection(index: number) {
+    const currentPlan = this.plan();
+    if (!currentPlan) return;
+
+    const sections = [...currentPlan.sections];
+    if (index < 0 || index >= sections.length) return;
+
+    sections[index] = { ...sections[index], ...this.tempSection } as StudySection;
+
+    const updatedPlan = { ...currentPlan, sections };
+
+    this.studyPlanService.updateStudyPlan(updatedPlan).subscribe((saved) => {
+      this.plan.set(saved);
+      this.editingSectionIndex.set(null);
+    });
+  }
+
+  deleteSection(index: number) {
+    if (!confirm('Are you sure you want to delete this section?')) return;
+    const currentPlan = this.plan();
+    if (!currentPlan) return;
+
+    const sections = [...currentPlan.sections];
+    sections.splice(index, 1);
+
+    const updatedPlan = { ...currentPlan, sections };
+
+    this.studyPlanService.updateStudyPlan(updatedPlan).subscribe((saved) => {
+      this.plan.set(saved);
+    });
+  }
+
+  moveSection(index: number, direction: 'up' | 'down') {
+    const currentPlan = this.plan();
+    if (!currentPlan) return;
+
+    const sections = [...currentPlan.sections];
+    if (direction === 'up') {
+      if (index === 0) return;
+      [sections[index], sections[index - 1]] = [sections[index - 1], sections[index]];
+    } else {
+      if (index === sections.length - 1) return;
+      [sections[index], sections[index + 1]] = [sections[index + 1], sections[index]];
+    }
+
+    const updatedPlan = { ...currentPlan, sections };
+
     this.studyPlanService.updateStudyPlan(updatedPlan).subscribe((saved) => {
       this.plan.set(saved);
     });

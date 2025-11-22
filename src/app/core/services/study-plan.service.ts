@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { NgxIndexedDBService } from 'ngx-indexed-db';
-import { Observable, from, map } from 'rxjs';
+import { Observable, from, map, forkJoin } from 'rxjs';
 import { StudyPlan, SectionMaterials, StudySection } from '../models/study-plan.model';
 
 @Injectable({
@@ -57,5 +57,34 @@ export class StudyPlanService {
 
   updateMaterials(materials: SectionMaterials): Observable<SectionMaterials> {
     return this.dbService.update('sectionMaterials', materials);
+  }
+
+  exportAllData(): Observable<{ studyPlans: StudyPlan[]; sectionMaterials: SectionMaterials[] }> {
+    return forkJoin({
+      studyPlans: this.dbService.getAll<StudyPlan>('studyPlans'),
+      sectionMaterials: this.dbService.getAll<SectionMaterials>('sectionMaterials'),
+    });
+  }
+
+  importAllData(data: {
+    studyPlans: StudyPlan[];
+    sectionMaterials: SectionMaterials[];
+  }): Observable<any> {
+    const { studyPlans, sectionMaterials } = data;
+
+    // Using bulkAdd for performance.
+    // We strip IDs to ensure we don't conflict with existing data and allow "import as copy".
+    // If the user wants to restore exact state, they should clear first (which we could offer).
+    // For now, we'll assume "Import" means "Add these to my library".
+
+    const plansWithoutIds = studyPlans.map(({ id, ...rest }) => rest);
+    const materialsWithoutIds = sectionMaterials.map(({ id, ...rest }) => rest);
+
+    return forkJoin([
+      plansWithoutIds.length ? this.dbService.bulkAdd('studyPlans', plansWithoutIds) : from([[]]),
+      materialsWithoutIds.length
+        ? this.dbService.bulkAdd('sectionMaterials', materialsWithoutIds)
+        : from([[]]),
+    ]);
   }
 }
