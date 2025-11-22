@@ -22,7 +22,9 @@ import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
     >
       <!-- Header -->
       <header class="bg-white border-b border-gray-200 shadow-sm">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div
+          class="max-w-7xl mx-auto px-4 md:px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+        >
           <button
             (click)="goBack()"
             class="flex items-center text-gray-600 hover:text-indigo-600 transition-colors duration-200"
@@ -37,19 +39,19 @@ import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
             </svg>
             Back to Home
           </button>
-          <h1 class="text-2xl font-bold text-gray-900">Study Plan</h1>
-          <div class="w-32"></div>
+          <h1 class="text-xl md:text-2xl font-bold text-gray-900">Study Plan</h1>
+          <div class="w-full sm:w-32"></div>
         </div>
       </header>
 
       <!-- Main Content -->
       <div class="max-w-7xl mx-auto px-6 py-8">
         <!-- Main Tabs -->
-        <div class="bg-white rounded-xl shadow-lg mb-6">
-          <div class="flex border-b border-gray-200">
+        <div class="bg-white rounded-xl shadow-lg mb-6 overflow-hidden">
+          <div class="flex border-b border-gray-200 overflow-x-auto no-scrollbar">
             <button
               (click)="mainTab.set('roadmap')"
-              class="flex-1 px-6 py-4 font-semibold text-sm transition-all duration-200 border-b-2"
+              class="flex-1 px-6 py-4 font-semibold text-sm transition-all duration-200 border-b-2 whitespace-nowrap"
               [class.border-indigo-600]="mainTab() === 'roadmap'"
               [class.text-indigo-600]="mainTab() === 'roadmap'"
               [class.border-transparent]="mainTab() !== 'roadmap'"
@@ -60,7 +62,7 @@ import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
             </button>
             <button
               (click)="mainTab.set('interview')"
-              class="flex-1 px-6 py-4 font-semibold text-sm transition-all duration-200 border-b-2"
+              class="flex-1 px-6 py-4 font-semibold text-sm transition-all duration-200 border-b-2 whitespace-nowrap"
               [class.border-indigo-600]="mainTab() === 'interview'"
               [class.text-indigo-600]="mainTab() === 'interview'"
               [class.border-transparent]="mainTab() !== 'interview'"
@@ -76,9 +78,11 @@ import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
         @if (mainTab() === 'roadmap') {
         <div class="space-y-6">
           <!-- Header Card -->
-          <div class="bg-white rounded-xl shadow-lg p-6">
-            <div class="flex items-center justify-between mb-4">
-              <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+          <div class="bg-white rounded-xl shadow-lg p-4 md:p-6">
+            <div
+              class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4"
+            >
+              <h2 class="text-xl md:text-2xl font-bold text-gray-900 flex items-center">
                 <span
                   class="w-10 h-10 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center text-white mr-3"
                 >
@@ -89,7 +93,7 @@ import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
               <button
                 (click)="regeneratePlan()"
                 [disabled]="isRegenerating()"
-                class="px-4 py-2 bg-indigo-100 text-indigo-700 font-medium rounded-lg hover:bg-indigo-200 transition-all duration-200 disabled:opacity-50"
+                class="w-full sm:w-auto px-4 py-2 bg-indigo-100 text-indigo-700 font-medium rounded-lg hover:bg-indigo-200 transition-all duration-200 disabled:opacity-50"
               >
                 {{ isRegenerating() ? 'Regenerating...' : 'Regenerate Plan' }}
               </button>

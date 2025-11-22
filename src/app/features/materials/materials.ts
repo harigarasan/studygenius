@@ -23,7 +23,7 @@ import {
     >
       <!-- Header -->
       <header class="bg-white border-b border-gray-200 shadow-sm">
-        <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-4">
           <button
             (click)="goBack()"
             class="flex items-center text-gray-600 hover:text-indigo-600 transition-colors duration-200 mb-3"
@@ -38,18 +38,20 @@ import {
             </svg>
             Back to Plan
           </button>
-          <h1 class="text-2xl font-bold text-gray-900">Study Materials: {{ section()?.title }}</h1>
+          <h1 class="text-xl md:text-2xl font-bold text-gray-900">
+            Study Materials: {{ section()?.title }}
+          </h1>
         </div>
       </header>
 
       <!-- Tabs -->
       <div class="bg-white border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-6">
-          <div class="flex space-x-8">
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+          <div class="flex space-x-4 md:space-x-8 overflow-x-auto no-scrollbar">
             <button
               [class.active]="activeTab() === 'slides'"
               (click)="activeTab.set('slides')"
-              class="px-4 py-4 font-semibold text-sm transition-all duration-200 border-b-2"
+              class="px-4 py-4 font-semibold text-sm transition-all duration-200 border-b-2 whitespace-nowrap"
               [class.border-indigo-600]="activeTab() === 'slides'"
               [class.text-indigo-600]="activeTab() === 'slides'"
               [class.border-transparent]="activeTab() !== 'slides'"
@@ -61,7 +63,7 @@ import {
             <button
               [class.active]="activeTab() === 'flashcards'"
               (click)="activeTab.set('flashcards')"
-              class="px-4 py-4 font-semibold text-sm transition-all duration-200 border-b-2"
+              class="px-4 py-4 font-semibold text-sm transition-all duration-200 border-b-2 whitespace-nowrap"
               [class.border-indigo-600]="activeTab() === 'flashcards'"
               [class.text-indigo-600]="activeTab() === 'flashcards'"
               [class.border-transparent]="activeTab() !== 'flashcards'"
@@ -73,7 +75,7 @@ import {
             <button
               [class.active]="activeTab() === 'quiz'"
               (click)="activeTab.set('quiz')"
-              class="px-4 py-4 font-semibold text-sm transition-all duration-200 border-b-2"
+              class="px-4 py-4 font-semibold text-sm transition-all duration-200 border-b-2 whitespace-nowrap"
               [class.border-indigo-600]="activeTab() === 'quiz'"
               [class.text-indigo-600]="activeTab() === 'quiz'"
               [class.border-transparent]="activeTab() !== 'quiz'"
@@ -87,18 +89,20 @@ import {
       </div>
 
       <!-- Content -->
-      <div class="max-w-7xl mx-auto px-6 py-8">
+      <div class="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <!-- SLIDES TAB -->
         @if (activeTab() === 'slides') {
         <div class="space-y-6">
           <!-- Subsections Header -->
-          <div class="bg-white rounded-xl shadow-lg p-6">
-            <div class="flex items-center justify-between">
+          <div class="bg-white rounded-xl shadow-lg p-4 md:p-6">
+            <div
+              class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+            >
               <h2 class="text-xl font-bold text-gray-900">Subsections</h2>
               <button
                 (click)="generateSubsections()"
                 [disabled]="isLoading()"
-                class="px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 disabled:opacity-50"
+                class="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 disabled:opacity-50"
               >
                 {{ isLoading() ? 'Generating...' : 'Generate Subsections' }}
               </button>
@@ -277,20 +281,22 @@ import {
         @if (activeTab() === 'flashcards') {
         <div class="space-y-6">
           <!-- Header -->
-          <div class="bg-white rounded-xl shadow-lg p-6">
-            <div class="flex items-center justify-between">
+          <div class="bg-white rounded-xl shadow-lg p-4 md:p-6">
+            <div
+              class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+            >
               <h2 class="text-xl font-bold text-gray-900">Flashcards</h2>
-              <div class="flex gap-3">
+              <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 <button
                   (click)="addFlashcard()"
-                  class="px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors duration-200"
+                  class="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors duration-200"
                 >
                   Add Flashcard
                 </button>
                 <button
                   (click)="generateFlashcards()"
                   [disabled]="isLoading()"
-                  class="px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 disabled:opacity-50"
+                  class="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 disabled:opacity-50"
                 >
                   {{ isLoading() ? 'Generating...' : 'Generate Flashcards' }}
                 </button>
@@ -406,21 +412,23 @@ import {
         @if (activeTab() === 'quiz') {
         <div class="space-y-6">
           <!-- Header -->
-          <div class="bg-white rounded-xl shadow-lg p-6">
-            <div class="flex items-center justify-between">
+          <div class="bg-white rounded-xl shadow-lg p-4 md:p-6">
+            <div
+              class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+            >
               <h2 class="text-xl font-bold text-gray-900">Quiz</h2>
-              <div class="flex gap-3">
+              <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 @if (!quizSubmitted()) {
                 <button
                   (click)="addQuizQuestion()"
-                  class="px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors duration-200"
+                  class="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors duration-200"
                 >
                   Add Question
                 </button>
                 <button
                   (click)="generateQuiz()"
                   [disabled]="isLoading()"
-                  class="px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 disabled:opacity-50"
+                  class="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 disabled:opacity-50"
                 >
                   {{ isLoading() ? 'Generating...' : 'Generate Quiz' }}
                 </button>
@@ -432,10 +440,10 @@ import {
           <!-- Quiz Questions -->
           @if (materials()?.quiz && materials()!.quiz!.length > 0) {
           <div class="space-y-4">
-            @for (q of materials()!.quiz!; track $index) {
+            @for (q of materials()!.quiz!; track $index; let qIdx = $index) {
             <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
               <div class="flex items-start justify-between mb-4">
-                @if (editingQuizIndex() === $index) {
+                @if (editingQuizIndex() === qIdx) {
                 <input
                   [(ngModel)]="tempQuiz.question"
                   class="flex-1 px-3 py-2 border-2 border-indigo-500 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none font-semibold"
@@ -443,14 +451,14 @@ import {
                 />
                 } @else {
                 <h3 class="font-semibold text-gray-900 flex-1">
-                  <span class="text-indigo-600 mr-2">Q{{ $index + 1 }}.</span>
+                  <span class="text-indigo-600 mr-2">Q{{ qIdx + 1 }}.</span>
                   {{ q.question }}
                 </h3>
                 } @if (!quizSubmitted()) {
                 <div class="flex gap-2 ml-4">
-                  @if (editingQuizIndex() === $index) {
+                  @if (editingQuizIndex() === qIdx) {
                   <button
-                    (click)="saveQuiz($index)"
+                    (click)="saveQuiz(qIdx)"
                     class="text-emerald-600 hover:text-emerald-700 text-lg"
                   >
                     ✓
@@ -463,13 +471,13 @@ import {
                   </button>
                   } @else {
                   <button
-                    (click)="editQuiz($index, q)"
+                    (click)="editQuiz(qIdx, q)"
                     class="text-indigo-600 hover:text-indigo-700 text-lg"
                   >
                     ✎
                   </button>
                   <button
-                    (click)="deleteQuiz($index)"
+                    (click)="deleteQuiz(qIdx)"
                     class="text-red-600 hover:text-red-700 text-lg"
                   >
                     🗑
@@ -479,7 +487,7 @@ import {
                 }
               </div>
 
-              @if (editingQuizIndex() === $index) {
+              @if (editingQuizIndex() === qIdx) {
               <div class="space-y-3">
                 @for (opt of tempQuizOptions; track $index; let i = $index) {
                 <div class="flex items-center gap-2">
@@ -502,23 +510,23 @@ import {
               <div class="space-y-2">
                 @for (option of q.options; track $index; let optIdx = $index) {
                 <button
-                  (click)="!quizSubmitted() && selectAnswer($index, optIdx)"
+                  (click)="!quizSubmitted() && selectAnswer(qIdx, optIdx)"
                   [disabled]="quizSubmitted()"
                   class="w-full text-left px-4 py-3 rounded-lg border-2 transition-all duration-200"
-                  [class.border-gray-200]="!quizSubmitted() && userAnswers()[$index] !== optIdx"
-                  [class.bg-gray-50]="!quizSubmitted() && userAnswers()[$index] !== optIdx"
-                  [class.border-indigo-500]="!quizSubmitted() && userAnswers()[$index] === optIdx"
-                  [class.bg-indigo-50]="!quizSubmitted() && userAnswers()[$index] === optIdx"
+                  [class.border-gray-200]="!quizSubmitted() && userAnswers()[qIdx] !== optIdx"
+                  [class.bg-gray-50]="!quizSubmitted() && userAnswers()[qIdx] !== optIdx"
+                  [class.border-indigo-500]="!quizSubmitted() && userAnswers()[qIdx] === optIdx"
+                  [class.bg-indigo-50]="!quizSubmitted() && userAnswers()[qIdx] === optIdx"
                   [class.border-emerald-500]="quizSubmitted() && optIdx === q.correctAnswerIndex"
                   [class.bg-emerald-50]="quizSubmitted() && optIdx === q.correctAnswerIndex"
                   [class.border-red-500]="
                     quizSubmitted() &&
-                    userAnswers()[$index] === optIdx &&
+                    userAnswers()[qIdx] === optIdx &&
                     optIdx !== q.correctAnswerIndex
                   "
                   [class.bg-red-50]="
                     quizSubmitted() &&
-                    userAnswers()[$index] === optIdx &&
+                    userAnswers()[qIdx] === optIdx &&
                     optIdx !== q.correctAnswerIndex
                   "
                 >
@@ -526,7 +534,7 @@ import {
                     <span class="flex-1">{{ option }}</span>
                     @if (quizSubmitted() && optIdx === q.correctAnswerIndex) {
                     <span class="text-emerald-600 font-bold ml-2">✓</span>
-                    } @if (quizSubmitted()) { @if (userAnswers()[$index] === optIdx && optIdx !==
+                    } @if (quizSubmitted()) { @if (userAnswers()[qIdx] === optIdx && optIdx !==
                     q.correctAnswerIndex) {
                     <span class="text-red-600 font-bold ml-2">✗</span>
                     } }

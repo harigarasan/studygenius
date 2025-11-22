@@ -14,18 +14,18 @@ import { StudyPlan } from '../../core/models/study-plan.model';
     <!-- Hero Section with Gradient -->
     <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       <!-- Header -->
-      <header class="text-center pt-12 pb-8">
+      <header class="text-center pt-8 md:pt-12 pb-6 md:pb-8 px-4">
         <h1
-          class="text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-3"
+          class="text-3xl md:text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2 md:mb-3"
         >
           StudyGenius
         </h1>
-        <p class="text-gray-600 text-lg">Your AI-powered study companion</p>
+        <p class="text-gray-600 text-base md:text-lg">Your AI-powered study companion</p>
       </header>
 
       <!-- Main Content -->
-      <div class="max-w-7xl mx-auto px-6 pb-12">
-        <div class="grid lg:grid-cols-2 gap-8">
+      <div class="max-w-7xl mx-auto px-4 md:px-6 pb-8 md:pb-12">
+        <div class="grid lg:grid-cols-2 gap-6 md:gap-8">
           <!-- Left Pane: Create New Plan -->
           <div
             class="bg-white rounded-2xl shadow-xl p-8 transform transition-all duration-300 hover:shadow-2xl"
@@ -116,18 +116,20 @@ import { StudyPlan } from '../../core/models/study-plan.model';
 
           <!-- Right Pane: Saved Plans -->
           <div class="bg-white rounded-2xl shadow-xl p-8">
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+            <div
+              class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4"
+            >
+              <h2 class="text-xl md:text-2xl font-bold text-gray-900 flex items-center">
                 <span
                   class="w-8 h-8 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center text-white text-sm mr-3"
                   >📚</span
                 >
                 Saved Plans
               </h2>
-              <div class="flex gap-2">
+              <div class="flex gap-2 w-full sm:w-auto">
                 <button
                   (click)="exportData()"
-                  class="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 hover:text-indigo-600 transition-colors duration-200 flex items-center shadow-sm"
+                  class="flex-1 sm:flex-none justify-center px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 hover:text-indigo-600 transition-colors duration-200 flex items-center shadow-sm"
                   title="Export Data"
                 >
                   <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
